@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'mypp',
     'rest_framework',
     'rest_framework.authtoken',
+    'corsheaders',
 ]
 import os
 MEDIA_URL = '/media/'

@@ -2,3 +2,4 @@ django
 djangorestframework
 environs
 Pillow
+django-cors-headers

@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import action
+from rest_framework.decorators import action,api_view
 from django.contrib.admin.views.decorators import staff_member_required
 from .serializers import OrderSerializer
 from .models import Order
@@ -21,41 +21,42 @@ from django.core.mail import EmailMultiAlternatives,send_mail
 from django.template.loader import render_to_string
 from django.shortcuts import redirect
 
-@staff_member_required
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def admin_dashboard(request):
-    mangoes = models.Mango.objects.all()
-    orders = models.Order.objects.all()
+    if request.method == 'GET':
+        mangoes = Mango.objects.all()
+        orders = Order.objects.all()
+        mango_serializer = MangoSerializer(mangoes, many=True)
+        order_serializer = OrderSerializer(orders, many=True)
+        return Response({
+            'mangoes': mango_serializer.data,
+            'orders': order_serializer.data
+        })
 
-    if request.method == 'POST':
-        if 'add_mango' in request.POST:
-            serializer = serializers.MangoSerializer(data=request.POST, context={'request': request})
-            if serializer.is_valid():
-                serializer.save()
-                return redirect('admin_dashboard')
-        elif 'change_status' in request.POST:
-            order_id = request.POST.get('order_id')
-            order = models.Order.objects.get(id=order_id)
-            order.status = 'Completed'
-            order.save()
-            send_mail(
-                'Order Completed',
-                f'Your order of {order.quantity} {order.mango.name}(s) has been completed.',
-                'ihanik.ad@gmail.com',
-                [order.user.email],
-                fail_silently=False,
-            )
-            return redirect('admin_dashboard')
-
-    mango_serializer = serializers.MangoSerializer()
-    order_serializer = serializers.OrderSerializer()
-
-    context = {
-        'mangoes': mangoes,
-        'orders': orders,
-        'mango_serializer': mango_serializer,
-        'order_serializer': order_serializer,
-    }
-    return render(request, 'admin_dashboard.html', context)
+    elif request.method == 'POST':
+        if 'add_mango' in request.data:
+            mango_serializer = MangoSerializer(data=request.data)
+            if mango_serializer.is_valid():
+                mango_serializer.save()
+                return Response(mango_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(mango_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        elif 'change_status' in request.data:
+            order_id = request.data.get('order_id')
+            try:
+                order = Order.objects.get(id=order_id)
+                order.status = 'Completed'
+                order.save()
+                send_mail(
+                    'Order Completed',
+                    f'Your order of {order.quantity} {order.mango.name}(s) has been completed.',
+                    'ihanik.ad@gmail.com',
+                    [order.user.email],
+                    fail_silently=False,
+                )
+                return Response({'status': 'Order status updated'}, status=status.HTTP_200_OK)
+            except Order.DoesNotExist:
+                return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
 
 class SellerViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]

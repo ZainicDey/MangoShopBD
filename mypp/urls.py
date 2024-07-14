@@ -8,7 +8,6 @@ from django.conf import settings
 router = DefaultRouter()
 router.register(r'sellers', SellerViewSet)
 router.register(r'mangoes', MangoViewSet)
-router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = [
     path('', include(router.urls)),
@@ -18,4 +17,5 @@ urlpatterns = [
     path('active/<uid64>/<token>/', views.activate, name = 'activate'),
     path('orders/my_orders/', OrderViewSet.as_view({'get': 'my_orders'}), name='my-orders'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('orders/', OrderView.as_view(), name='order-list-create'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

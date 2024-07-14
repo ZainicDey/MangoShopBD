@@ -71,6 +71,7 @@ class MangoViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 
+
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -81,7 +82,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def get_queryset(self):
-        permission_classes = [AllowAny]
+        permission_classes = [permissions.AllowAny]
         if self.request.user.is_staff:
             return models.Order.objects.all()
         return models.Order.objects.filter(user=self.request.user)
@@ -97,17 +98,20 @@ class OrderViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def change_status(self, request, pk=None):
-        order = self.get_object()
-        order.status = 'Completed'
-        order.save()
-        send_mail(
-            'Order Completed',
-            f'Your order of {order.quantity} {order.mango.name}(s) has been completed.',
-            'ihanik.ad@gmail.com',
-            [order.user.email],
-            fail_silently=False,
-        )
-        return Response({'status': 'Order status updated'})
+        try:
+            order = self.get_object()
+            order.status = 'Completed'
+            order.save()
+            send_mail(
+                'Order Completed',
+                f'Your order of {order.quantity} {order.mango.name}(s) has been completed.',
+                'ihanik.ad@gmail.com',
+                [order.user.email],
+                fail_silently=False,
+            )
+            return Response({'status': 'Order status updated'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class UserRegistrationApiView(APIView):
     serializer_class = serializers.RegistrationSerializer  

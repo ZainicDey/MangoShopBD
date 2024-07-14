@@ -76,12 +76,12 @@ class OrderView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        orders = Order.objects.filter(user=request.user)
-        serializer = OrderSerializer(orders, many=True)
+        orders = models.Order.objects.filter(user=request.user)
+        serializer = serializers.OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = OrderSerializer(data=request.data)
+        serializer = serializers.OrderSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

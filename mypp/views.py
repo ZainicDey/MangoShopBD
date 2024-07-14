@@ -12,7 +12,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import action,api_view
+from rest_framework.decorators import action,api_view, permission_classes, parser_classes
 from django.contrib.admin.views.decorators import staff_member_required
 from .serializers import OrderSerializer
 from .models import Order

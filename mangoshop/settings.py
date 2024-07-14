@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-mzm26alam*s%53m7j3w4#x(+wl3uvkgfq4y#_ba=32h$fp-&8@
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
-
+CSRF_TRUSTED_ORIGINS = ['https://mangoshopbd.onrender.com/']
 
 # Application definition
 

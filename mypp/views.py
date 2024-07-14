@@ -14,6 +14,8 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from django.contrib.admin.views.decorators import staff_member_required
+from .serializers import OrderSerializer
+from .models import Order
 # for sending email
 from django.core.mail import EmailMultiAlternatives,send_mail
 from django.template.loader import render_to_string
@@ -73,38 +75,22 @@ class MangoViewSet(viewsets.ModelViewSet):
 
 
 class OrderView(APIView):
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        orders = models.Order.objects.filter(user=request.user)
-        serializer = serializers.OrderSerializer(orders, many=True)
+        print(request.user)  # Log the authenticated user
+        orders = Order.objects.filter(user=request.user)
+        serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = serializers.OrderSerializer(data=request.data)
+        print(request.user)  # Log the authenticated user
+        serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
-    def change_status(self, request, pk=None):
-        try:
-            order = self.get_object()
-            order.status = 'Completed'  # Example: Updating order status
-            order.save()
-
-            # Example: Sending email notification upon order status change
-            send_mail(
-                'Order Completed',
-                f'Your order of {order.quantity} {order.mango.name}(s) has been completed.',
-                'ihanik.ad@gmail.com',
-                [order.user.email],
-                fail_silently=False,
-            )
-
-            return Response({'status': 'Order status updated'}, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         
 class UserRegistrationApiView(APIView):
     serializer_class = serializers.RegistrationSerializer  

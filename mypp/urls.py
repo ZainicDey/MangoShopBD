@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import SellerViewSet, MangoViewSet, OrderViewSet
+from .views import SellerViewSet, MangoViewSet, OrderView
 from . import views
 #media url
 from django.conf.urls.static import static

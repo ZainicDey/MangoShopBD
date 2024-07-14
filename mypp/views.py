@@ -135,22 +135,20 @@ def activate(request, uid64, token):
 
 class UserLoginApiView(APIView):
     def post(self, request):
-        serializer = serializers.UserLoginSerializer(data = self.request.data)
+        serializer = serializers.UserLoginSerializer(data=self.request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
 
-            user = authenticate(username= username, password=password)
+            user = authenticate(username=username, password=password)
             
             if user:
+                login(request, user)  # Log in the user
                 token, _ = Token.objects.get_or_create(user=user)
-                print(token)
-                print(_)
-                login(request, user)
-                return Response({'token' : token.key, 'user_id' : user.id})
+                return Response({'token': token.key, 'user_id': user.id})
             else:
-                return Response({'error' : "Invalid Credential"})
-        return Response(serializer.errors)
+                return Response({'error': "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLogoutView(APIView):
     def get(self, request):

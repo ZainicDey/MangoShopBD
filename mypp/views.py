@@ -67,7 +67,7 @@ class MangoViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.OrderSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -99,6 +99,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         
 class UserRegistrationApiView(APIView):
     serializer_class = serializers.RegistrationSerializer  
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
         
@@ -138,6 +139,7 @@ def activate(request, uid64, token):
 class UserLoginApiView(APIView):
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=request.data)
+        permission_classes = [AllowAny]
         if serializer.is_valid():
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
@@ -153,7 +155,9 @@ class UserLoginApiView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class UserLogoutView(APIView):
-    def get(self, request):
-        request.user.auth_token.delete()
-        logout(request)
-        return redirect('login')
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()  # Delete the token
+        logout(request)  # Log out the user
+        return Response({"detail": "Successfully logged out."}, status=status.HTTP_200_OK)

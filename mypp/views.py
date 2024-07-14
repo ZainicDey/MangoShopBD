@@ -56,11 +56,13 @@ def admin_dashboard(request):
     return render(request, 'admin_dashboard.html', context)
 
 class SellerViewSet(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
     queryset = serializers.Seller.objects.all()
     serializer_class = serializers.SellerSerializer
 
 class MangoViewSet(viewsets.ModelViewSet):
     queryset = models.Mango.objects.all()
+    permission_classes = [AllowAny]
     serializer_class = serializers.MangoSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']

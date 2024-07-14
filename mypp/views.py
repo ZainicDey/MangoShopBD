@@ -75,16 +75,17 @@ class MangoViewSet(viewsets.ModelViewSet):
 
 
 class OrderView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        authentication_classes = [TokenAuthentication]
         print(request.user)  # Log the authenticated user
         orders = Order.objects.filter(user=request.user)
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        authentication_classes = [TokenAuthentication]
-        print(request.user) 
+        print(request.user)  # Log the authenticated user
         serializer = OrderSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

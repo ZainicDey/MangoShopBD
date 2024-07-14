@@ -75,9 +75,6 @@ class MangoViewSet(viewsets.ModelViewSet):
 
 
 class OrderView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, request):
         print(request.user)  # Log the authenticated user
         orders = Order.objects.filter(user=request.user)

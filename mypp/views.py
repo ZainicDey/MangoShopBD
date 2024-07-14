@@ -69,22 +69,22 @@ class MangoViewSet(viewsets.ModelViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.OrderSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         if self.request.user.is_staff:
             return models.Order.objects.all()
         return models.Order.objects.filter(user=self.request.user)
-
+    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
+    
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def my_orders(self, request):
         orders = self.get_queryset()
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data)
-
+    
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def change_status(self, request, pk=None):
         order = self.get_object()

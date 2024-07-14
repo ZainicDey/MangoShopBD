@@ -72,6 +72,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        permission_classes = [AllowAny]
         if self.request.user.is_staff:
             return models.Order.objects.all()
         return models.Order.objects.filter(user=self.request.user)

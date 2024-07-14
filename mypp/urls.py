@@ -15,7 +15,6 @@ urlpatterns = [
     path('login/', views.UserLoginApiView.as_view(), name='login'),
     path('logout/', views.UserLogoutView.as_view(), name='logout'),
     path('active/<uid64>/<token>/', views.activate, name = 'activate'),
-    path('orders/my_orders/', OrderViewSet.as_view({'get': 'my_orders'}), name='my-orders'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('orders/', OrderView.as_view(), name='order-list-create'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

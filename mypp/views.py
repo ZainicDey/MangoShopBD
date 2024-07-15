@@ -5,7 +5,7 @@ from . import serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.tokens import default_token_generator
-from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
+from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser,BasePermission
 from rest_framework.authentication import TokenAuthentication
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
@@ -73,9 +73,13 @@ class MangoViewSet(viewsets.ModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+        
+class IsUserId3(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.id == 3
+
 class AdminMangoView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsUserId3]
 
     def post(self, request):
         print(request.user)  # Log the authenticated admin user
@@ -104,8 +108,7 @@ class OrderView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class AdminOrderView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated, IsAdminUser]
+    permission_classes = [IsUserId3]
 
     def get(self, request):
         print(request.user)  # Log the authenticated admin user

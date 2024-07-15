@@ -20,8 +20,12 @@ class MangoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mango
         fields = ['id', 'name', 'image', 'description', 'price', 'quantity', 'seller']
+
     def create(self, validated_data):
-        return Mango.objects.create(**validated_data)
+        seller_data = validated_data.pop('seller')
+        seller, created = Seller.objects.get_or_create(**seller_data)
+        mango = Mango.objects.create(seller=seller, **validated_data)
+        return mango
 
 class OrderSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())

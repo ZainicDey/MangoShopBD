@@ -5,7 +5,7 @@ from . import serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.tokens import default_token_generator
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes

@@ -17,4 +17,5 @@ urlpatterns = [
     path('active/<uid64>/<token>/', views.activate, name = 'activate'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('orders/', OrderView.as_view(), name='order-list-create'),
+    path('admin/orders/', AdminOrderView.as_view(), name='admin-order-list'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

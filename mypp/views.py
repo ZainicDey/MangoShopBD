@@ -93,6 +93,32 @@ class OrderView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+class AdminOrderView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        print(request.user)  # Log the authenticated admin user
+        orders = Order.objects.all()
+        serializer = OrderSerializer(orders, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        print(request.user)  # Log the authenticated admin user
+        order_id = request.data.get('id')
+        new_status = request.data.get('status')
+
+        if new_status not in ['Pending', 'Completed']:
+            return Response({'error': 'Invalid status. Allowed statuses are "Pending" or "Completed".'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            order = Order.objects.get(id=order_id)
+            order.status = new_status
+            order.save()
+            return Response({'status': 'Order status updated successfully.'}, status=status.HTTP_200_OK)
+        except Order.DoesNotExist:
+            return Response({'error': 'Order not found.'}, status=status.HTTP_404_NOT_FOUND)
+            
 class UserRegistrationApiView(APIView):
     serializer_class = serializers.RegistrationSerializer  
     permission_classes = [AllowAny]

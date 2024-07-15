@@ -79,7 +79,8 @@ class IsUserId3(BasePermission):
         return request.user.is_authenticated and request.user.id == 3
 
 class AdminMangoView(APIView):
-    permission_classes = [IsUserId3]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsUserId3]
 
     def post(self, request):
         print(request.user)  # Log the authenticated admin user
@@ -108,8 +109,8 @@ class OrderView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class AdminOrderView(APIView):
-    permission_classes = [IsUserId3]
-
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated, IsUserId3]
     def get(self, request):
         print(request.user)  # Log the authenticated admin user
         orders = Order.objects.all()

@@ -18,4 +18,5 @@ urlpatterns = [
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('orders/', OrderView.as_view(), name='order-list-create'),
     path('admin/orders/', AdminOrderView.as_view(), name='admin-order-list'),
+    path('admin/mangoes/', AdminMangoView.as_view(), name='admin-mango-create'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
